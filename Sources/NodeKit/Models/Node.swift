@@ -25,6 +25,13 @@ public struct Node: Sendable, Codable {
 
     /// Identifier of the ``NodeTemplate/Kind`` this node was instantiated
     /// from. Resolve via ``TemplateRegistry/registeredNodeTemplate(with:)``.
+    ///
+    /// If the template isn't currently registered (e.g. a plugin wasn't
+    /// loaded for this session), the node still exists in the graph and is
+    /// persisted across saves — the editor renders a dimmed "Missing
+    /// template" placeholder for it that the user can still select, move,
+    /// and delete. Registering a template with this identifier later
+    /// restores normal rendering and any edges to its ports.
     public let templateIdentifier: UUID
 
     /// The node's top-left position on the canvas, in editor coordinates.

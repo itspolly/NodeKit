@@ -172,6 +172,18 @@ struct GraphCanvas: View {
                         graph: $graph,
                         onTap: { selectNode(node.id, additive: commandIsHeld) }
                     )
+                } else {
+                    // Template not registered (yet, or any more — e.g. a plugin
+                    // wasn't loaded). Render a recoverable placeholder so the
+                    // user can still select / move / delete the node instead
+                    // of having it silently disappear from the canvas. See
+                    // ``MissingTemplateNodeView`` and ``Node/templateIdentifier``.
+                    MissingTemplateNodeView(
+                        node: node,
+                        state: state,
+                        graph: $graph,
+                        onTap: { selectNode(node.id, additive: commandIsHeld) }
+                    )
                 }
             }
         }
