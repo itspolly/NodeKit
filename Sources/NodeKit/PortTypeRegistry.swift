@@ -31,10 +31,12 @@ import Foundation
 ///
 /// ## Ordering of mutations
 ///
-/// `register` / `unregister` are synchronous on `MainActor` and take effect
-/// in call order. If you issue calls from multiple async tasks, the
-/// MainActor schedules them but doesn't order them by call site — await
-/// each call before issuing the next if you need a deterministic sequence.
+/// `register` and `unregister` are synchronous and, called from MainActor
+/// code, take effect in call order. Called from outside MainActor they
+/// need to be treated as asynchronous (the call hops across actor
+/// isolation). If you issue calls from multiple async tasks, the MainActor
+/// schedules them but doesn't order them by call site — await each call
+/// before issuing the next if you need a specific sequence.
 @Observable
 @MainActor
 public final class PortTypeRegistry {

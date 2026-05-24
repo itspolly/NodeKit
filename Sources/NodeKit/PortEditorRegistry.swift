@@ -12,14 +12,25 @@ import SwiftUI
 /// SwiftUI view that edits that value (rendered next to the port label).
 ///
 /// NodeKit registers built-in editors for the four primitive port types on
-/// init. Consumers (MissionKit, plugins) register their own port types here
-/// alongside: the typed `register` overload hides `Data` (de)serialization so
-/// plugin authors work with their strong type and the registry deals with
-/// `PortValue.custom`.
+/// init. Consumers register their own port types here alongside: the typed
+/// `register` overload hides `Data` (de)serialization so plugin authors
+/// work with their strong type and the registry deals with
+/// ``PortValue/custom(typeIdentifier:data:)``.
 ///
-/// `@MainActor` because editor builders are SwiftUI views; lookups happen
-/// from SwiftUI render paths anyway.
-/// TODO: check if UI re-renders on registration
+/// ## Concurrency and ordering
+///
+/// `PortEditorRegistry` is `@Observable` and isolated to `@MainActor`.
+/// `register` is synchronous and, called from MainActor code, takes effect
+/// in call order — a synchronous loop produces deterministic, sequential
+/// state. Views that read ``hasInlineEditor(for:)`` /
+/// ``defaultValue(for:)`` / ``editor(for:value:)`` from their `body`
+/// re-render automatically when the catalog changes.
+///
+/// Called from outside MainActor `register` needs to be treated as
+/// asynchronous (the call hops across actor isolation). If you issue
+/// registrations from multiple async tasks, the MainActor schedules them
+/// but doesn't order them by call site — await each call before issuing
+/// the next if you need a specific sequence.
 @MainActor
 @Observable
 public final class PortEditorRegistry {

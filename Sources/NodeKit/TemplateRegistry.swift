@@ -28,6 +28,19 @@ import Foundation
 /// trying to track a content anchor — a future improvement could pin a
 /// scroll-anchor `kind.id` and restore its visual position after mutations.
 ///
+/// ## Concurrency and ordering
+///
+/// The registry is `@Observable` and isolated to `@MainActor`. `register`
+/// and `unregister` are synchronous and, called from MainActor code, take
+/// effect in call order — a synchronous loop produces deterministic,
+/// sequential state.
+///
+/// Called from outside MainActor they need to be treated as asynchronous
+/// (the call hops across actor isolation). If you issue registrations from
+/// multiple async tasks, the MainActor schedules them but doesn't order
+/// them by call site — await each call before issuing the next if you
+/// need a specific sequence.
+///
 /// ## Path to a remote-backed registry
 ///
 /// Today everything lives in memory. To back this with a remote source:
