@@ -16,12 +16,16 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             TemplateRegistryView(
-                templateRegistry: registryModel.registry,
+                templateRegistry: registryModel.templates,
                 predicate: $browserFilter
             )
             .frame(width: 320)
         } detail: {
-            GraphEditor(graph: $graph, templateRegistry: registryModel.registry)
+            GraphEditor(
+                graph: $graph,
+                templateRegistry: registryModel.templates,
+                portTypeRegistry: registryModel.portTypes
+            )
         }
     }
 }

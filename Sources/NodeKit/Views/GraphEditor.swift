@@ -74,12 +74,23 @@ public struct GraphEditor: View {
 #if DEBUG
 @MainActor
 private enum GraphEditorPreviewSeed {
-    static func make() -> (Graph, TemplateRegistry) {
-        let inA = NodeTemplate.Port(id: UUID(), kind: .input, type: .bool, localizedDisplayName: "Trigger")
+    static func make() -> (Graph, TemplateRegistry, PortTypeRegistry) {
+        // Demonstrate a custom `PortType` alongside the four NodeKit
+        // primitives. The editor reads `portTypes` for colour/name hints;
+        // compatibility on the connection hot path is identifier-based.
+        let portTypes = PortTypeRegistry()
+        let trigger = PortType(
+            id: "preview.trigger",
+            localizedDisplayName: "Trigger",
+            color: .init(red: 0.78, green: 0.40, blue: 0.92)
+        )
+        portTypes.register(trigger)
+
+        let inA = NodeTemplate.Port(id: UUID(), kind: .input, type: trigger, localizedDisplayName: "Trigger")
         let inB = NodeTemplate.Port(id: UUID(), kind: .input, type: .string, localizedDisplayName: "Payload")
         let outA = NodeTemplate.Port(id: UUID(), kind: .output, type: .string, localizedDisplayName: "Result")
 
-        let sourceTick = NodeTemplate.Port(id: UUID(), kind: .output, type: .bool, localizedDisplayName: "Tick")
+        let sourceTick = NodeTemplate.Port(id: UUID(), kind: .output, type: trigger, localizedDisplayName: "Tick")
         let sourceOut = NodeTemplate.Port(id: UUID(), kind: .output, type: .string, localizedDisplayName: "Stream")
         let sinkIn = NodeTemplate.Port(id: UUID(), kind: .input, type: .string, localizedDisplayName: "Sink")
 
@@ -132,22 +143,28 @@ private enum GraphEditorPreviewSeed {
             outgoingConnectionsByPortIdentifier: [:]
         )
 
-        return (Graph(nodes: [sourceNode, processNode, sinkNode]), registry)
+        return (Graph(nodes: [sourceNode, processNode, sinkNode]), registry, portTypes)
     }
 }
 
 private struct GraphEditorPreviewHost: View {
     @State private var graph: Graph
     private let registry: TemplateRegistry
+    private let portTypes: PortTypeRegistry
 
     init() {
         let seed = GraphEditorPreviewSeed.make()
         _graph = State(initialValue: seed.0)
         registry = seed.1
+        portTypes = seed.2
     }
 
     var body: some View {
-        GraphEditor(graph: $graph, templateRegistry: registry)
+        GraphEditor(
+            graph: $graph,
+            templateRegistry: registry,
+            portTypeRegistry: portTypes
+        )
     }
 }
 

@@ -129,6 +129,7 @@ struct ContentView: View {
     @State private var graph = Graph(nodes: [])
     @State private var browserFilter: TemplatePredicate = .filter(name: nil, scope: nil)
     @State var templates = TemplateRegistry()
+    @State var portTypes = PortTypeRegistry()
 
     var body: some View {
         NavigationSplitView {
@@ -138,11 +139,20 @@ struct ContentView: View {
             )
             .frame(width: 320)
         } detail: {
-            GraphEditor(graph: $graph, templateRegistry: templates)
+            GraphEditor(
+                graph: $graph,
+                templateRegistry: templates,
+                portTypeRegistry: portTypes
+            )
         }
     }
 }
 ```
+
+The four primitive ``PortType``s come pre-registered in
+``PortTypeRegistry``; register custom types there for any port whose
+``NodeTemplate/Port/typeIdentifier`` isn't one of NodeKit's built-ins.
+See <doc:CustomPortTypes> for the full pattern.
 
 Drag templates from the browser onto the canvas to create nodes. Drag from
 one node's output port to another node's compatible input to connect them.

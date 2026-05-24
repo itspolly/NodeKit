@@ -48,22 +48,34 @@ struct ContentView: View {
     @State private var graph = Graph(nodes: [])
     @State private var filter: TemplatePredicate = .filter(name: nil, scope: nil)
     @State var templates = TemplateRegistry()
+    @State var portTypes = PortTypeRegistry()
 
     var body: some View {
         NavigationSplitView {
             TemplateRegistryView(templateRegistry: templates, predicate: $filter)
                 .frame(width: 320)
         } detail: {
-            GraphEditor(graph: $graph, templateRegistry: templates)
+            GraphEditor(
+                graph: $graph,
+                templateRegistry: templates,
+                portTypeRegistry: portTypes
+            )
         }
     }
 }
 ```
 
-Register a few `NodeTemplate`s with the registry (each with input/output
-`Port`s of a known `PortType`) and you're done — drag templates from the
-browser onto the canvas, then drag from one node's output to another's
-compatible input to wire them up.
+Register a few `NodeTemplate`s with `templates` (each with input/output
+`Port`s of a known `PortType` — built-in primitives like `.bool`, `.int`,
+`.double`, `.string` are pre-registered) and you're done. Drag templates
+from the browser onto the canvas, then drag from one node's output to
+another's compatible input to wire them up.
+
+Custom port types? Register them in `portTypes` so the editor knows their
+colour and display name — see [Adding custom port types][custom] for the
+full pattern.
+
+[custom]: https://nodekit.jamie.software/documentation/nodekit/customporttypes
 
 > ⚠️ **Required Info.plist entry.** The browser-to-canvas drag uses a custom
 > UTI, `is.polly.nodekit.template`, that the host app must export. Add it
