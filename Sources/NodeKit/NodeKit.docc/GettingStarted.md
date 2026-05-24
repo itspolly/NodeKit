@@ -19,7 +19,7 @@ NodeKit is distributed as a Swift Package. Add it from Xcode
 (*File ▸ Add Package Dependencies…*) or in `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/itspolly/NodeKit.git", from: "0.1.0"),
+.package(url: "https://github.com/itspolly/NodeKit.git", from: "1.0.0"),
 ```
 
 Then add `"NodeKit"` to your target's dependencies and `import NodeKit`.
