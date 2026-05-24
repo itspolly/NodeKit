@@ -27,10 +27,29 @@ public struct NodeTemplate: Sendable, Equatable, Codable {
     /// Ports that drive outgoing connections.
     public let outputs: [Port]
 
+    /// Whether this template can be instantiated more than once in the same
+    /// ``Graph``. When `false`, the editor's drop handler refuses to create a
+    /// second ``Node`` for this template's ``Kind/id`` — useful for
+    /// singletons (e.g. a "Document Properties" or "Output" node that only
+    /// makes sense once per graph).
+    ///
+    /// Mutable so consumers can flip the flag without rebuilding the template
+    /// — e.g. a registry could opt all globally-installed templates into
+    /// reusability while marking project-local templates as singletons.
+    public var reusable: Bool
+
     /// Create a node template.
-    public init(kind: Kind, inputs: [Port], outputs: [Port]) {
+    ///
+    /// - Parameters:
+    ///   - kind: Identity + display name.
+    ///   - inputs: Input ports.
+    ///   - outputs: Output ports.
+    ///   - reusable: Whether this template can be instantiated more than once
+    ///     in a graph. Defaults to `true`.
+    public init(kind: Kind, inputs: [Port], outputs: [Port], reusable: Bool = true) {
         self.kind = kind
         self.inputs = inputs
         self.outputs = outputs
+        self.reusable = reusable
     }
 }

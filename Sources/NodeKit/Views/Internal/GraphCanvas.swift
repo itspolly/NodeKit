@@ -381,6 +381,13 @@ struct GraphCanvas: View {
     private func handleDrop(items: [TemplateDragPayload], screenLocation: CGPoint) {
         for item in items {
             guard let template = templateRegistry.registeredNodeTemplate(with: item.templateKindID) else { continue }
+            // Singleton templates (`reusable == false`) refuse a second
+            // instance per graph. Drops onto an already-present singleton
+            // are silently ignored; the user sees no node appear.
+            if !template.reusable,
+               graph.nodes.contains(where: { $0.templateIdentifier == template.kind.id }) {
+                continue
+            }
             let canvasPoint = state.canvasPoint(fromScreen: screenLocation)
             let newNode = Node(
                 id: UUID(),
