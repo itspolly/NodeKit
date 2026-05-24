@@ -47,12 +47,13 @@ import NodeKit
 struct ContentView: View {
     @State private var graph = Graph(nodes: [])
     @State private var filter: TemplatePredicate = .filter(name: nil, scope: nil)
-    let templates = TemplateRegistry()
+    @State var templates = TemplateRegistry()
 
     var body: some View {
-        HStack(spacing: 0) {
+        NavigationSplitView {
             TemplateRegistryView(templateRegistry: templates, predicate: $filter)
                 .frame(width: 320)
+        } detail: {
             GraphEditor(graph: $graph, templateRegistry: templates)
         }
     }
