@@ -11,7 +11,11 @@ struct PortAnchor: Equatable, Sendable {
     let nodeID: UUID
     let portID: UUID
     let kind: NodeTemplate.Port.Kind
-    let type: NodeTemplate.Port.PortType
+    /// The port's ``PortType`` identifier. Stored as the bare string so the
+    /// drag/hover hot path can do compatibility checks without a
+    /// ``PortTypeRegistry`` round-trip — `canConnect` is just
+    /// `lhs.typeIdentifier == rhs.typeIdentifier`.
+    let typeIdentifier: String
     /// Center of the port hit-circle, in canvas coordinates.
     let center: CGPoint
     /// Ports with an inline value are excluded from hover-snapping and don't

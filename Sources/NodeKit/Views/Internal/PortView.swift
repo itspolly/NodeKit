@@ -20,6 +20,14 @@ struct PortView: View {
         Node.PortReference(nodeIdentifier: nodeID, portIdentifier: port.id)
     }
 
+    /// Resolved ``PortType`` for this port — `nil` when no registration is
+    /// available. The port still renders (and still wires up correctly,
+    /// since compatibility is identifier-based), it just falls back to a
+    /// neutral colour and a generic name.
+    private var resolvedType: PortType? {
+        state.portTypeRegistry.portType(for: port.typeIdentifier)
+    }
+
     var body: some View {
         let isHovered = state.pendingConnection?.hover?.reference == reference
         let isSource = state.pendingConnection?.source == reference
@@ -42,7 +50,10 @@ struct PortView: View {
                 .shadow(color: .accentColor.opacity(isHovered ? 0.55 : 0), radius: 6)
                 .contentShape(.circle.inset(by: -NodeStyle.portHitInset))
         }
-        .opacity(isDisabled ? 0.35 : 1)
+        // Unresolved port types render dimmer to flag that something is
+        // missing from `PortTypeRegistry`. Connections still wire up (the
+        // hot path compares identifier strings, not resolved values).
+        .opacity(isDisabled ? 0.35 : (resolvedType == nil ? 0.55 : 1))
         .background(
             // Publish this port's center in canvas coordinates so the connection
             // layer and drag hit-testing can find it.
@@ -54,7 +65,7 @@ struct PortView: View {
                         nodeID: nodeID,
                         portID: port.id,
                         kind: port.kind,
-                        type: port.type,
+                        typeIdentifier: port.typeIdentifier,
                         center: CGPoint(x: frame.midX, y: frame.midY),
                         disabled: isDisabled
                     )]
@@ -88,31 +99,31 @@ struct PortView: View {
                 state.pendingConnection?.hover = nearestCompatiblePort(
                     to: value.location,
                     sourceKind: port.kind,
-                    sourceType: port.type
+                    sourceTypeIdentifier: port.typeIdentifier
                 )
             }
             .onEnded { _ in
                 guard let pending = state.pendingConnection else { return }
                 if let hover = pending.hover {
                     let outputRef: Node.PortReference
-                    let outputType: NodeTemplate.Port.PortType
+                    let outputTypeID: String
                     let inputRef: Node.PortReference
-                    let inputType: NodeTemplate.Port.PortType
+                    let inputTypeID: String
                     if pending.sourceKind.isOutput {
                         outputRef = pending.source
-                        outputType = port.type
+                        outputTypeID = port.typeIdentifier
                         inputRef = hover.reference
-                        inputType = hover.type
+                        inputTypeID = hover.typeIdentifier
                     } else {
                         outputRef = hover.reference
-                        outputType = hover.type
+                        outputTypeID = hover.typeIdentifier
                         inputRef = pending.source
-                        inputType = port.type
+                        inputTypeID = port.typeIdentifier
                     }
                     // Belt-and-braces — hover filtering already rejects
                     // incompatible drops, but re-check on release in case
                     // anchors shifted mid-drag.
-                    if outputType.canConnect(to: inputType) {
+                    if outputTypeID == inputTypeID {
                         graph.connect(source: outputRef, target: inputRef)
                     }
                 }
@@ -123,17 +134,16 @@ struct PortView: View {
     private func nearestCompatiblePort(
         to point: CGPoint,
         sourceKind: NodeTemplate.Port.Kind,
-        sourceType: NodeTemplate.Port.PortType
+        sourceTypeIdentifier: String
     ) -> PortAnchor? {
         let needed: NodeTemplate.Port.Kind = sourceKind.isInput ? .output : .input
         let snap: CGFloat = 28
         var best: (PortAnchor, CGFloat)?
         for anchor in state.portAnchors.values
-        where anchor.kind == needed && anchor.nodeID != nodeID && !anchor.disabled {
-            let (outputType, inputType) = sourceKind.isOutput
-                ? (sourceType, anchor.type)
-                : (anchor.type, sourceType)
-            guard outputType.canConnect(to: inputType) else { continue }
+        where anchor.kind == needed
+            && anchor.nodeID != nodeID
+            && !anchor.disabled
+            && anchor.typeIdentifier == sourceTypeIdentifier {
             let dx = anchor.center.x - point.x
             let dy = anchor.center.y - point.y
             let dist = (dx * dx + dy * dy).squareRoot()

@@ -42,9 +42,22 @@ final class GraphEditorState {
     var portAnchors: [Node.PortReference: PortAnchor] = [:]
 
     /// Default values + inline editor views for each registered port type.
-    /// Set by `GraphEditor` at init; defaults to a fresh registry with the
-    /// built-in primitives.
-    var portEditorRegistry: PortEditorRegistry = PortEditorRegistry()
+    /// Injected by `GraphEditor` at construction.
+    let portEditorRegistry: PortEditorRegistry
+
+    /// Catalogue used by the editor to resolve a port's
+    /// ``NodeTemplate/Port/typeIdentifier`` back to a ``PortType`` for
+    /// rendering hints (colour, display name). Injected by `GraphEditor` at
+    /// construction.
+    let portTypeRegistry: PortTypeRegistry
+
+    init(
+        portTypeRegistry: PortTypeRegistry,
+        portEditorRegistry: PortEditorRegistry
+    ) {
+        self.portTypeRegistry = portTypeRegistry
+        self.portEditorRegistry = portEditorRegistry
+    }
 
     // In-flight new connection
     struct PendingConnection: Equatable {

@@ -13,8 +13,8 @@ import Foundation
 /// The four primitive cases (``bool(_:)``, ``int(_:)``, ``double(_:)``,
 /// ``string(_:)``) are NodeKit's built-ins. Any richer type comes through
 /// ``custom(typeIdentifier:data:)``: a `typeIdentifier` (matching some
-/// ``NodeTemplate/Port/PortType/id``) and an opaque `Data` blob whose encoding
-/// is the responsibility of whoever registered that port type with the
+/// ``PortType/id``) and an opaque `Data` blob whose encoding is the
+/// responsibility of whoever registered that port type with the
 /// ``PortEditorRegistry``. NodeKit itself never decodes `.custom` data — it
 /// just stores it and round-trips it through `Codable`.
 public enum PortValue: Sendable, Equatable, Codable {
@@ -32,14 +32,14 @@ public enum PortValue: Sendable, Equatable, Codable {
     /// JSON.
     case custom(typeIdentifier: String, data: Data)
 
-    /// Identifier of the matching ``NodeTemplate/Port/PortType``. Useful for
-    /// dispatching back to the right inline editor.
+    /// Identifier of the matching ``PortType``. Useful for dispatching back
+    /// to the right inline editor.
     public var typeIdentifier: String {
         switch self {
-        case .bool:   return NodeTemplate.Port.PortType.bool.id
-        case .int:    return NodeTemplate.Port.PortType.int.id
-        case .double: return NodeTemplate.Port.PortType.double.id
-        case .string: return NodeTemplate.Port.PortType.string.id
+        case .bool:   return PortType.bool.id
+        case .int:    return PortType.int.id
+        case .double: return PortType.double.id
+        case .string: return PortType.string.id
         case .custom(let typeIdentifier, _): return typeIdentifier
         }
     }

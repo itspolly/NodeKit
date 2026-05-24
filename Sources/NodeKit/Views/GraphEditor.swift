@@ -13,24 +13,26 @@ import SwiftUI
 public struct GraphEditor: View {
     @Binding var graph: Graph
     var templateRegistry: TemplateRegistry
-    var portEditorRegistry: PortEditorRegistry
 
-    @State private var state = GraphEditorState()
+    @State private var state: GraphEditorState
 
     public init(
         graph: Binding<Graph>,
         templateRegistry: TemplateRegistry,
+        portTypeRegistry: PortTypeRegistry = PortTypeRegistry(),
         portEditorRegistry: PortEditorRegistry = PortEditorRegistry()
     ) {
         self._graph = graph
         self.templateRegistry = templateRegistry
-        self.portEditorRegistry = portEditorRegistry
+        self._state = State(initialValue: GraphEditorState(
+            portTypeRegistry: portTypeRegistry,
+            portEditorRegistry: portEditorRegistry
+        ))
     }
 
     public var body: some View {
         GraphCanvas(graph: $graph, templateRegistry: templateRegistry, state: state)
             .overlay(alignment: .bottomTrailing) { editorToolbar }
-            .onAppear { state.portEditorRegistry = portEditorRegistry }
     }
 
     // MARK: - Toolbar

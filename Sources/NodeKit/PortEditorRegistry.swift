@@ -111,7 +111,7 @@ public final class PortEditorRegistry {
     /// the matching non-`custom` `PortValue` case directly (no Data round
     /// trip) so the on-disk shape stays the simple enum form.
     private func registerPrimitives() {
-        let bool = NodeTemplate.Port.PortType.bool.id
+        let bool = PortType.bool.id
         entries[bool] = Entry(
             defaultValue: { .bool(false) },
             editorBuilder: { binding in
@@ -129,7 +129,7 @@ public final class PortEditorRegistry {
             }
         )
 
-        let int = NodeTemplate.Port.PortType.int.id
+        let int = PortType.int.id
         entries[int] = Entry(
             defaultValue: { .int(0) },
             editorBuilder: { binding in
@@ -148,7 +148,7 @@ public final class PortEditorRegistry {
             }
         )
 
-        let double = NodeTemplate.Port.PortType.double.id
+        let double = PortType.double.id
         entries[double] = Entry(
             defaultValue: { .double(0) },
             editorBuilder: { binding in
@@ -167,7 +167,7 @@ public final class PortEditorRegistry {
             }
         )
 
-        let string = NodeTemplate.Port.PortType.string.id
+        let string = PortType.string.id
         entries[string] = Entry(
             defaultValue: { .string("") },
             editorBuilder: { binding in

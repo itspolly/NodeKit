@@ -98,8 +98,13 @@ registry.register(template: source)
 registry.register(template: sink)
 ```
 
-The four primitive ``NodeTemplate/Port/PortType`` values — `.bool`, `.int`,
-`.double`, `.string` — come pre-registered with matching inline editors.
+The four primitive ``PortType`` values — `.bool`, `.int`, `.double`,
+`.string` — come pre-registered with matching inline editors.
+
+Ports reference their ``PortType`` by ``NodeTemplate/Port/typeIdentifier``
+(a `String`). For convenience there's an overload on ``NodeTemplate/Port``
+that takes the type value directly — the convenience init in the snippet
+above uses it (`type: .double`).
 
 ## Host the editor
 

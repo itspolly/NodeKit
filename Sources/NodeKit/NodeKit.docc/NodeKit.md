@@ -30,6 +30,8 @@ NodeKit owns the editing experience, your app owns what the graph *means*.
 ### Describing nodes
 
 - ``NodeTemplate``
+- ``PortType``
+- ``ColorComponents``
 - ``TemplatePredicate``
 - ``Page``
 

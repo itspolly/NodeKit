@@ -115,7 +115,7 @@ struct NodeView: View {
             to: Node.PortReference(nodeIdentifier: node.id, portIdentifier: port.id)
         )
         let canInline = isInput
-            && state.portEditorRegistry.hasInlineEditor(for: port.type.id)
+            && state.portEditorRegistry.hasInlineEditor(for: port.typeIdentifier)
 
         HStack(spacing: 8) {
             if !isLeft {
@@ -141,7 +141,7 @@ struct NodeView: View {
 
                 if inlineValue != nil,
                    let editor = state.portEditorRegistry.editor(
-                       for: port.type.id,
+                       for: port.typeIdentifier,
                        value: portValueBinding(for: port.id)
                    )
                 {
@@ -156,7 +156,7 @@ struct NodeView: View {
                     .buttonStyle(.plain)
                 } else if canInline {
                     Button {
-                        if let initial = state.portEditorRegistry.defaultValue(for: port.type.id) {
+                        if let initial = state.portEditorRegistry.defaultValue(for: port.typeIdentifier) {
                             graph.setPortValue(nodeID: node.id, portID: port.id, value: initial)
                         }
                     } label: {
