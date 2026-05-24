@@ -30,7 +30,7 @@ NodeKit is a Swift Package. Add it from Xcode (*File ▸ Add Package
 Dependencies…*) or in `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/itspolly/NodeKit.git", from: "0.1.0"),
+.package(url: "https://github.com/itspolly/NodeKit.git", from: "0.2.0"),
 ```
 
 Then add `"NodeKit"` to your target's dependencies and `import NodeKit`.
@@ -120,6 +120,11 @@ HTML
 
 Then commit the updated `docs/` and push. GitHub Pages should be configured
 to serve from the **`main` branch / `/docs` folder**.
+
+## Releases
+
+Changelogs and tagged releases live on GitHub:
+**[github.com/itspolly/NodeKit/releases](https://github.com/itspolly/NodeKit/releases)**
 
 ## License
 
